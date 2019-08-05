@@ -20,32 +20,36 @@ html
       }
   body
     div#page-switcher
-      button onclick="showViewPage()" View Library
-      button onclick="showSearchPage()" Add Books
+      button id="view-page-button" onclick="showViewPage()" Print View
+      button id="search-page-button" onclick="showSearchPage()" Search View
     
     div#search-page
-    form id="search-form" onsubmit="return false"
-      input name="search"
-      input type="submit" value="Search" onclick="submitSearch()"
+      form id="search-form" onsubmit="return false"
+        input name="search"
+        input type="submit" value="Search" onclick="submitSearch()"
 
-    table width="100%"
+    table width="100%" id="search-results"
       thead
         tr style="text-align: left;"
           th width="40%" Title
           th width="30%" Author
           th width="10%" Year
           th width="20%" ID
-
       tbody id="search-results"
 
     div#view-page               
-
     script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"
     = javascript type="text/javascript"
 
       function showSearchPage() {
           $("#search-page").show();
           $("#view-page").hide();
+          $(document).ready(function(){ 
+            $('#search-page-button').click(function(){ 
+              $("#search-results").find("tr:gt(0)").remove();
+              $("#search-results").find("tr:eq(0)").remove();
+            });
+          });
       }
 
       function showViewPage() {

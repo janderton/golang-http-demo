@@ -45,7 +45,7 @@ func verifyDatabase(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 }
 
 func main() {
-	db, _ := sql.Open("sqlite3", "dev.db")
+	db, _ := sql.Open("sqlite3", "./dev.db")
 
 	mux := http.NewServeMux()
 
