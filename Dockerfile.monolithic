@@ -1,4 +1,3 @@
-# Monolithic Build
 FROM golang:alpine
 LABEL maintainer=" $USER <$USER@$USER.com>"
 LABEL description="Demo GoLang App"
@@ -10,7 +9,6 @@ RUN go get github.com/codegangsta/negroni && \
     go get github.com/mattn/go-sqlite3 && \
     go get github.com/yosssi/ace
 
-#ADD . .
 ADD src/dev.db /app/dev.db
 ADD templates /app/templates/
 ADD src/main.go /app/main.go
