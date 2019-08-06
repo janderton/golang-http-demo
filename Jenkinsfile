@@ -26,11 +26,11 @@ pipeline {
                      go get github.com/mattn/go-sqlite3 && \
                      go get github.com/yosssi/ace'
                 
-               ### go-sqlite3 requires CGO_ENABLED=1 and static linked mode to work in the scratch container
+               // go-sqlite3 requires CGO_ENABLED=1 and static linked mode to work in the scratch container
                 sh 'CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o goapp ./src'
                 
               }
-              ###TODO: Archive artifact from above step
+              //TODO: Archive artifact from above step
             }
           }
         }
