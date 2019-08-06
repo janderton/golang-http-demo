@@ -9,31 +9,28 @@ pipeline {
         }
         steps {
           container('go') {
-            dir ('/home/jenkins/go/src/github.com/janderton/golang-http') {
+            dir ('/home/jenkins/go/src/github.com/janderton/golang-http-demo') {
               checkout scm
             }
-            dir ('/home/jenkins/go/src/github.com/janderton/golang-http/charts/golang-http') {
+            dir ('/home/jenkins/go/src/github.com/janderton/golang-http-demo') {
                 // ensure we're not on a detached head
                 sh "git checkout master"
                 // until we switch to the new kubernetes / jenkins credential implementation use git credentials store
                 sh "git config --global credential.helper store"
 
-                sh "jx step git credentials"
             }
-            dir ('/home/jenkins/go/src/github.com/janderton/golang-http') {
-              // so we can retrieve the version in later steps
-              sh "echo \$(jx-release-version) > VERSION"
-            }
-            dir ('/home/jenkins/go/src/github.com/janderton/golang-http/charts/golang-http') {
-              sh "make tag"
-            }
-            dir ('/home/jenkins/go/src/github.com/janderton/golang-http') {
+            dir ('/home/jenkins/go/src/github.com/janderton/golang-http-demo') {
               container('go') {
-                sh "make build"
-                sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
-
-                sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
+                sh 'apk add --no-cache --update build-base gcc abuild binutils binutils-doc gcc-doc git musl-dev'
+                sh ' go get github.com/codegangsta/negroni && \
+                     go get github.com/mattn/go-sqlite3 && \
+                     go get github.com/yosssi/ace'
+                
+               ### go-sqlite3 requires CGO_ENABLED=1 and static linked mode to work in the scratch container
+                sh 'CGO_ENABLED=1 GOOS=linux go build -a -ldflags '-linkmode external -extldflags "-static"' -o goapp ./src'
+                
               }
+              ###TODO: Archive artifact from above step
             }
           }
         }
