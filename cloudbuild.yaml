@@ -4,6 +4,7 @@ steps:
   args: [
     'build',
     '-t', "gcr.io/$PROJECT_ID/go-http-demo:$SHORT_SHA",
+    '-t', "gcr.io/$PROJECT_ID/go-http-demo:latest",
     '--file', "Dockerfile.monolithic",
     '.']
   id: 'build_monolithic'
