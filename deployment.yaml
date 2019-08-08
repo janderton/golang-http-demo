@@ -30,7 +30,7 @@ spec:
         app: go-http-demo
     spec:
       containers:
-      - image: go-http-demo:latest
+      - image: janderton/go-http-demo:v1
         imagePullPolicy: IfNotPresent
         name: go-http-demo
         resources: {}

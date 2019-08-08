@@ -1,0 +1,19 @@
+FROM golang:alpine
+LABEL maintainer=" $USER <$USER@$USER.com>"
+LABEL description="Demo GoLang App"
+
+WORKDIR /app
+
+RUN apk add --no-cache --update build-base gcc abuild binutils binutils-doc gcc-doc git musl-dev
+RUN go get github.com/codegangsta/negroni && \
+    go get github.com/mattn/go-sqlite3 && \
+    go get github.com/yosssi/ace
+
+ADD src/old_main.go /app/main.go
+
+RUN CGO_ENABLED=1 GOOS=linux go build -a -o goapp .
+
+ENV PORT 8080
+EXPOSE 8080
+
+ENTRYPOINT ["/app/goapp"]
