@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: go-http-demo
+  name: go-http-demo
+  namespace: demo
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: go-http-demo
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: go-http-demo
+    spec:
+      containers:
+      - image: go-http-demo:latest
+        imagePullPolicy: IfNotPresent
+        name: go-http-demo
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: go-http-demo
+  name: go-http-demo-service
+  namespace: demo
+spec:
+  clusterIP: "" 
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: go-http-demo
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: go-http-demo-ingress
+  namespace: demo
+spec:
+ rules:
+ - http:
+     paths:
+     - path: /
+       backend:
+           serviceName: go-http-demo-service
+           servicePort: 80

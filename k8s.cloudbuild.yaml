@@ -1,0 +1,33 @@
+steps:
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-t', "gcr.io/$PROJECT_ID/go-http-demo:$SHORT_SHA",
+    '-t', "gcr.io/$PROJECT_ID/go-http-demo:latest",
+    '--file', "Dockerfile.monolithic",
+    '.']
+  id: 'build_monolithic'
+  timeout: 600s
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$PROJECT_ID/go-http-demo:$SHORT_SHA"]
+  id: 'push_short_sha'
+  wait_for: ['build_monolithic']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', "gcr.io/$PROJECT_ID/go-http-demo:latest"]
+  id: 'push_latest'
+  wait_for: ['build_monolithic']
+
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['set', 'image', 'deployment/go-http-demo', "*=gcr.io/$PROJECT_ID/go-http-demo:$SHORT_SHA", '--namespace', 'demo']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=<$YOUR_CLUSTER_REGION>'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=<$YOUR_CLUSTER_NAME>'
+  - 'CLOUDSDK_CONTAINER_USE_APPLICATION_DEFAULT_CREDENTIALS=true'
+
+images: [
+  "gcr.io/$PROJECT_ID/go-http-demo:$SHORT_SHA",
+  "gcr.io/$PROJECT_ID/go-http-demo:latest",
+]
